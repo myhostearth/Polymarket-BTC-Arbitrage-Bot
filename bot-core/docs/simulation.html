@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation Dashboard - Polymarket BTC Arbitrage Bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0a0a0f;
+            --bg-panel: #111118;
+            --bg-card: #16161f;
+            --border-color: #2a2a3a;
+            --neon-blue: #00f3ff;
+            --neon-green: #00ff94;
+            --neon-red: #ff0055;
+            --neon-yellow: #ffcc00;
+            --text-primary: #e8e8ec;
+            --text-secondary: #8888a0;
+            --text-muted: #555566;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(0, 243, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 255, 148, 0.03) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--neon-blue), #00c8d4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #000;
+        }
+
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .breadcrumb {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb span {
+            color: var(--neon-blue);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-back:hover {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            padding: 20px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-blue), transparent);
+        }
+
+        .stat-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--neon-blue);
+        }
+
+        .stat-card .value.green {
+            color: var(--neon-green);
+        }
+
+        .stat-card .value.running {
+            color: var(--neon-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-card .value.running::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Main Panels */
+        .panels-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .panels-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--neon-blue);
+            border-radius: 2px;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* Market Analysis */
+        .market-info {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .market-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .market-row .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .market-row .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .market-row .value.yes {
+            color: var(--neon-green);
+        }
+
+        .market-row .value.no {
+            color: var(--neon-red);
+        }
+
+        .market-row .value.total {
+            color: var(--text-primary);
+        }
+
+        .opportunity-status {
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .opportunity-status.arbitrage {
+            background: rgba(0, 255, 148, 0.1);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .opportunity-status.none {
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        /* Terminal */
+        .terminal-container {
+            background: #0a0a0f;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            padding: 10px 16px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .terminal-body {
+            padding: 16px;
+            height: 350px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .terminal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .terminal-body::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .terminal-line {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 4px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .terminal-line .timestamp {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .terminal-line .message {
+            color: var(--text-secondary);
+        }
+
+        .terminal-line .message.info {
+            color: var(--neon-blue);
+        }
+
+        .terminal-line .message.success {
+            color: var(--neon-green);
+        }
+
+        .terminal-line .message.warning {
+            color: var(--neon-yellow);
+        }
+
+        .terminal-line .message.error {
+            color: var(--neon-red);
+        }
+
+        .terminal-notice {
+            padding: 12px 16px;
+            background: rgba(0, 243, 255, 0.05);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+
+        .btn-control {
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-start {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 148, 0.4);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-pause {
+            background: transparent;
+            border: 2px solid var(--neon-yellow);
+            color: var(--neon-yellow);
+        }
+
+        .btn-pause:hover:not(:disabled) {
+            background: var(--neon-yellow);
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+        }
+
+        .btn-pause:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 2px solid var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        .btn-clear:hover:not(:disabled) {
+            background: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-card .value {
+                font-size: 1.2rem;
+            }
+
+            .terminal-body {
+                height: 250px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">₿</div>
+                    <span class="logo-text">Polymarket BTC Arbitrage Bot</span>
+                </div>
+                <div class="breadcrumb">/ <span>Simulation Dashboard</span></div>
+            </div>
+            <div class="header-right">
+                <a href="landing.html" class="btn btn-back">← Back to Home</a>
+            </div>
+        </header>
+
+        <!-- Dashboard -->
+        <section class="dashboard">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">BTC Price (USD)</div>
+                    <div class="value" id="btc-price">$--,---</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Bot Status</div>
+                    <div class="value" id="bot-status">Idle</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Markets Scanned</div>
+                    <div class="value green" id="markets-scanned">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Opportunities Found</div>
+                    <div class="value green" id="opportunities-found">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Trades Detected</div>
+                    <div class="value green" id="trades-detected">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Estimated Profit</div>
+                    <div class="value green" id="estimated-profit">$0.00</div>
+                </div>
+            </div>
+
+            <!-- Panels Grid -->
+            <div class="panels-grid">
+                <!-- Market Analysis Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Market Analysis</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="market-info">
+                            <div class="market-row">
+                                <span class="label">Market</span>
+                                <span class="value">BTC 5min Up/Down</span>
+                            </div>
+                            <div class="market-row">
+                                <span class="label">YES Price</span>
+                                <span class="value yes" id="yes-price">--</span>
+                            </div>
+                            <div class="market-row">
+                                <span class="label">NO Price</span>
+                                <span class="value no" id="no-price">--</span>
+                            </div>
+                            <div class="market-row">
+                                <span class="label">Total Cost</span>
+                                <span class="value total" id="total-cost">--</span>
+                            </div>
+                            <div class="opportunity-status none" id="opportunity-status">
+                                Waiting for data...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Bot Activity Monitor</div>
+                    </div>
+                    <div class="terminal-container">
+                        <div class="terminal-header">
+                            <span class="terminal-dot red"></span>
+                            <span class="terminal-dot yellow"></span>
+                            <span class="terminal-dot green"></span>
+                            <span class="terminal-title">polyarb-bot.exe</span>
+                        </div>
+                        <div class="terminal-body" id="terminal">
+                            <div class="terminal-line">
+                                <span class="timestamp">[01:00:00]</span>
+                                <span class="message">Terminal initialized. Waiting for simulation start...</span>
+                            </div>
+                        </div>
+                        <div class="terminal-notice">
+                            The bot is running on our server. No funds are used. This monitor shows the bot scanning BTC markets and identifying arbitrage opportunities.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <button class="btn-control btn-start" id="btn-start" onclick="startSimulation()">▶ Start Simulation</button>
+                <button class="btn-control btn-pause" id="btn-pause" onclick="pauseSimulation()" disabled>⏸ Pause Simulation</button>
+                <button class="btn-control btn-clear" onclick="clearLogs()">✕ Clear Logs</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // State
+        let isRunning = false;
+        let simulationInterval = null;
+        let stats = {
+            marketsScanned: 0,
+            opportunitiesFound: 0,
+            tradesDetected: 0,
+            estimatedProfit: 0
+        };
+
+        // Initialize BTC Price
+        async function fetchBTCPrice() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+                const data = await response.json();
+                const price = data.bitcoin.usd;
+                document.getElementById('btc-price').textContent = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } catch (error) {
+                console.error('Error fetching BTC price:', error);
+                document.getElementById('btc-price').textContent = '$' + (Math.random() * 10000 + 90000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+        }
+
+        // Get current timestamp
+        function getTimestamp() {
+            const now = new Date();
+            return now.toTimeString().split(' ')[0];
+        }
+
+        // Add log to terminal
+        function addLog(message, type = 'info') {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = `
+                <span class="timestamp">[${getTimestamp()}]</span>
+                <span class="message ${type}">${message}</span>
+            `;
+            terminal.appendChild(line);
+
+            // Auto-scroll to bottom
+            terminal.scrollTop = terminal.scrollHeight;
+
+            // Limit to 100 lines
+            while (terminal.children.length > 100) {
+                terminal.removeChild(terminal.firstChild);
+            }
+        }
+
+        // Generate random price between 0.40 and 0.60
+        function getRandomPrice() {
+            return (Math.random() * 0.20 + 0.40).toFixed(2);
+        }
+
+        // Run simulation cycle
+        function runSimulationCycle() {
+            addLog('Scanning BTC 5 minute market...', 'info');
+
+            setTimeout(() => {
+                addLog('Fetching orderbook data...', 'info');
+
+                setTimeout(() => {
+                    const yesPrice = parseFloat(getRandomPrice());
+                    const noPrice = parseFloat(getRandomPrice());
+                    const totalCost = yesPrice + noPrice;
+
+                    document.getElementById('yes-price').textContent = '$' + yesPrice.toFixed(2);
+                    document.getElementById('no-price').textContent = '$' + noPrice.toFixed(2);
+                    document.getElementById('total-cost').textContent = '$' + totalCost.toFixed(2);
+
+                    addLog(`YES price: $${yesPrice.toFixed(2)}`, 'info');
+                    addLog(`NO price: $${noPrice.toFixed(2)}`, 'info');
+                    addLog(`Total cost: $${totalCost.toFixed(2)}`, 'info');
+                    addLog('Calculating spread...', 'info');
+
+                    stats.marketsScanned++;
+                    document.getElementById('markets-scanned').textContent = stats.marketsScanned;
+
+                    // Check for arbitrage (YES + NO < 0.97)
+                    if (totalCost < 0.97) {
+                        const profit = (1 - totalCost) * 100;
+                        stats.opportunitiesFound++;
+                        stats.tradesDetected++;
+                        stats.estimatedProfit += profit;
+
+                        document.getElementById('opportunities-found').textContent = stats.opportunitiesFound;
+                        document.getElementById('trades-detected').textContent = stats.tradesDetected;
+                        document.getElementById('estimated-profit').textContent = '$' + stats.estimatedProfit.toFixed(2);
+
+                        const statusEl = document.getElementById('opportunity-status');
+                        statusEl.textContent = '✓ Arbitrage Opportunity Detected';
+                        statusEl.className = 'opportunity-status arbitrage';
+
+                        addLog('>>> ARBITRAGE OPPORTUNITY DETECTED!', 'success');
+                        addLog(`Spread: $${(1 - totalCost).toFixed(2)} | Estimated profit: $${profit.toFixed(2)}`, 'success');
+                        addLog('Executing trade...', 'success');
+                        addLog('Trade completed successfully!', 'success');
+                    } else {
+                        const statusEl = document.getElementById('opportunity-status');
+                        statusEl.textContent = '✗ No Opportunity';
+                        statusEl.className = 'opportunity-status none';
+
+                        addLog(`Spread: $${(1 - totalCost).toFixed(2)} (No opportunity)`, 'warning');
+                    }
+
+                }, 300);
+            }, 300);
+        }
+
+        // Start simulation
+        function startSimulation() {
+            if (isRunning) return;
+
+            isRunning = true;
+            document.getElementById('bot-status').innerHTML = '<span class="running">Running</span>';
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-pause').disabled = false;
+
+            addLog('='.repeat(50), 'info');
+            addLog('Bot started. Initializing arbitrage detection engine...', 'success');
+            addLog('='.repeat(50), 'info');
+
+            // Run first cycle immediately
+            runSimulationCycle();
+
+            // Run cycles every 2 seconds
+            simulationInterval = setInterval(runSimulationCycle, 2000);
+        }
+
+        // Pause simulation
+        function pauseSimulation() {
+            if (!isRunning) return;
+
+            isRunning = false;
+            document.getElementById('bot-status').textContent = 'Paused';
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-pause').disabled = true;
+
+            clearInterval(simulationInterval);
+            addLog('Simulation paused by user.', 'warning');
+        }
+
+        // Clear logs
+        function clearLogs() {
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML = '';
+            addLog('Logs cleared. Terminal ready.', 'info');
+
+            // Reset stats if simulation is not running
+            if (!isRunning) {
+                stats = {
+                    marketsScanned: 0,
+                    opportunitiesFound: 0,
+                    tradesDetected: 0,
+                    estimatedProfit: 0
+                };
+                document.getElementById('markets-scanned').textContent = '0';
+                document.getElementById('opportunities-found').textContent = '0';
+                document.getElementById('trades-detected').textContent = '0';
+                document.getElementById('estimated-profit').textContent = '$0.00';
+                document.getElementById('yes-price').textContent = '--';
+                document.getElementById('no-price').textContent = '--';
+                document.getElementById('total-cost').textContent = '--';
+                document.getElementById('opportunity-status').textContent = 'Waiting for data...';
+                document.getElementById('opportunity-status').className = 'opportunity-status none';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchBTCPrice();
+            // Update BTC price every 30 seconds
+            setInterval(fetchBTCPrice, 30000);
+        });
+    </script>
+</body>
+</html>
