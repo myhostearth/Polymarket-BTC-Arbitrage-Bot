@@ -70,8 +70,10 @@ export default function LandingPage() {
 
             {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-8">
-                <div className="max-w-7xl mx-auto flex items-center justify-between xl:justify-end backdrop-blur-md bg-white/[0.01] border border-white/5 px-8 py-4 rounded-full">
-                    {/* Brand Removed per request */}
+                <div className="max-w-7xl mx-auto flex items-center justify-between backdrop-blur-md bg-white/[0.01] border border-white/5 px-8 py-4 rounded-full">
+                    <div className="flex items-center gap-3">
+                        <span className="font-bold tracking-tighter text-lg uppercase">PolyArb_V2</span>
+                    </div>
                     <div className="hidden md:flex items-center gap-10">
                         <div className="flex items-center gap-6 mr-4 pr-6 border-r border-white/10">
                             <Link href="https://github.com/whatapponthetime/Polymarket-BTC-Arbitrage-Bot.git" target="_blank">
@@ -271,7 +273,6 @@ export default function LandingPage() {
                 <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 text-zinc-600">
                     <div className="col-span-1 md:col-span-2">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-6 h-6 rounded bg-zinc-800 flex items-center justify-center text-white/40 font-black text-xs">₿</div>
                             <span className="font-bold tracking-tighter text-white/80 uppercase">Polymarket_Arbitrage_Engine</span>
                         </div>
                         <p className="text-xs leading-relaxed max-w-xs uppercase font-bold tracking-widest opacity-60">
