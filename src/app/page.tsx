@@ -70,11 +70,8 @@ export default function LandingPage() {
 
             {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-8">
-                <div className="max-w-7xl mx-auto flex items-center justify-between backdrop-blur-md bg-white/[0.01] border border-white/5 px-8 py-4 rounded-full">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-black font-black text-sm">₿</div>
-                        <span className="font-bold tracking-tighter text-lg uppercase">PolyArb_V2</span>
-                    </div>
+                <div className="max-w-7xl mx-auto flex items-center justify-between xl:justify-end backdrop-blur-md bg-white/[0.01] border border-white/5 px-8 py-4 rounded-full">
+                    {/* Brand Removed per request */}
                     <div className="hidden md:flex items-center gap-10">
                         <div className="flex items-center gap-6 mr-4 pr-6 border-r border-white/10">
                             <Link href="https://github.com/whatapponthetime/Polymarket-BTC-Arbitrage-Bot.git" target="_blank">
@@ -105,40 +102,73 @@ export default function LandingPage() {
 
             <main className="relative z-10 pt-48 pb-20 px-6">
                 {/* Hero Section */}
-                <section className="max-w-7xl mx-auto text-center mb-32">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/20 bg-accent/5 text-accent text-[10px] font-bold uppercase tracking-widest mb-8">
-                            <Lightning size={14} weight="fill" />
-                            High Speed Polymarket Execution Architecture
-                        </div>
-                        <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-8 bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent leading-[0.95]">
-                            Algorithmic Arbitrage <br /> for Prediction Markets
-                        </h1>
-                        <p className="max-w-2xl mx-auto text-zinc-500 text-lg mb-12 font-medium leading-relaxed">
-                            The PolyArb_V2 engine conducts sub-second analysis of 5-minute binary markets, identifying and executing spread inefficiencies at high speed.
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                            <Link href="/dashboard">
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="px-10 py-4 bg-accent text-black font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.3)] group"
+                <section className="max-w-7xl mx-auto mb-40">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+                        {/* Text Content (Left - 7 columns) */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -40 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 1.2, delay: 0.2 }}
+                            className="lg:col-span-7 flex flex-col items-start text-left order-1"
+                        >
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] text-accent text-[10px] font-bold uppercase tracking-widest mb-8 backdrop-blur-sm">
+                                <div className="w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
+                                Real-time Execution Module Enabled
+                            </div>
+
+                            <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent leading-[1.05] -ml-1">
+                                Algorithmic <br /> Arbitrage
+                                <span className="block mt-2 text-3xl lg:text-5xl text-zinc-500 font-medium">for Prediction Markets</span>
+                            </h1>
+
+                            <p className="max-w-xl text-zinc-400 text-lg md:text-xl mb-12 font-medium leading-relaxed opacity-90">
+                                The PolyArb_V2 engine conducts sub-second analysis of 5-minute binary markets, identifying and executing spread inefficiencies at high speed.
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
+                                <Link href="/dashboard" className="w-full sm:w-auto">
+                                    <motion.button
+                                        whileHover={{ scale: 1.05, y: -2 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="w-full sm:w-auto px-10 py-4 bg-accent text-black font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-[0_15px_30px_rgba(16,185,129,0.2)] group relative overflow-hidden"
+                                    >
+                                        <span className="relative z-10 flex items-center justify-center gap-3">
+                                            Launch Terminal
+                                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                        </span>
+                                    </motion.button>
+                                </Link>
+                                <Link href="https://github.com/whatapponthetime/Polymarket-BTC-Arbitrage-Bot.git" target="_blank" className="w-full sm:w-auto">
+                                    <button className="w-full sm:w-auto px-10 py-4 text-zinc-400 hover:text-white font-bold text-sm uppercase tracking-[0.2em] border-b border-white/5 hover:border-white/40 transition-all">
+                                        Documentation_MD
+                                    </button>
+                                </Link>
+                            </div>
+                        </motion.div>
+
+                        {/* Video Showcase (Right - 5 columns) */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 40, filter: "blur(20px)" }}
+                            animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                            transition={{ duration: 1.6, ease: [0.23, 1, 0.32, 1] }}
+                            className="lg:col-span-5 relative order-2 flex justify-center lg:justify-end mt-12 lg:mt-0"
+                        >
+                            {/* Ambient Glow behind video */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-accent/20 blur-[100px] rounded-full opacity-50 pointer-events-none" />
+
+                            <div className="relative w-full max-w-[480px]">
+                                <video
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    className="w-full h-auto object-contain mix-blend-screen opacity-100 drop-shadow-[0_0_30px_rgba(16,185,129,0.2)]"
                                 >
-                                    Enter Operational Dashboard
-                                    <ArrowRight size={18} className="inline-block ml-3 group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
-                            </Link>
-                            <Link href="https://github.com/whatapponthetime/Polymarket-BTC-Arbitrage-Bot.git" target="_blank">
-                                <button className="px-10 py-4 text-zinc-400 hover:text-white font-bold text-sm uppercase tracking-[0.2em] border border-white/5 hover:border-white/20 rounded-2xl transition-all">
-                                    Documentation_MD
-                                </button>
-                            </Link>
-                        </div>
-                    </motion.div>
+                                    <source src="/pol.webm" type="video/webm" />
+                                </video>
+                            </div>
+                        </motion.div>
+                    </div>
                 </section>
 
                 {/* System Heuristics - Features */}
